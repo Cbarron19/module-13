@@ -1,6 +1,6 @@
 #*****************************************************************************
 #
-# RoboPyLib_v0_97.py
+# RoboPyLib_v0_98.py
 #
 # Copyright 2016 William Henning
 #
@@ -9,6 +9,7 @@
 # April 27, 2016: Initial Release
 # May 20, 2016: First "Real" Release
 # June 21, 2016: updated pulseGen
+# March 3, 2017: added pwmWrite(pin,pulse,period)
 #
 # Pure Python support library for RoboPi firmware, for use with RoboPi
 #
@@ -50,6 +51,7 @@ SERVOREAD   	= 19 	# read last value written to servo
 READDIST  	= 20 	# read distance sensor
 PULSEGEN	= 21	# start high frequency pulse train generator
 PULSESTOP	= 22	# stop pulse train generator
+PWMWRITE	= 23	# arbitrary PWM generator
 
 # pin types
 
@@ -249,6 +251,19 @@ def analogWrite(pin, val):
 def servoWrite(pin, val):
   putPacket(SERVOWRITE, bytearray([pin, val & 255, val >> 8]), 3)
   getPacket()
+
+#**********************************************************************************
+
+def pwmWrite(pin, pulse, period):
+  if pulse < 0:
+    pulse = 0
+  if pulse >= period:
+    pulse = 0
+    digitalWrite(pin,1)
+  puls = pulse/5
+  perio = period/5
+  putPacket(PWMWRITE, bytearray([pin, puls & 255, puls >> 8, perio & 255, perio >> 8]), 5)
+  print getPacket()
 
 #**********************************************************************************
 
